@@ -1,2 +1,11 @@
 fastapi
 uvicorn
+langchain-community 
+boto3
+langchain
+pymongo
+unstructured
+langchain-openai
+tiktoken
+openai
+python-dotenv

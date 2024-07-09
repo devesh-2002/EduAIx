@@ -10,3 +10,4 @@ tiktoken
 openai
 python-dotenv
 deepgram-sdk
+langchain-cli

@@ -1,3 +1,4 @@
+import os
 from langchain.chains import LLMChain
 from dotenv import load_dotenv
 from langchain_community.vectorstores import MongoDBAtlasVectorSearch

@@ -8,6 +8,10 @@ from langchain_community.document_loaders import TextLoader
 from pymongo import MongoClient
 from langchain_community.document_loaders import TextLoader
 from audio import save_text_to_file
+from langchain_community.document_loaders.recursive_url_loader import RecursiveUrlLoader
+from bs4 import BeautifulSoup as Soup
+
+
 import uuid
 import os
 from dotenv import load_dotenv
@@ -22,7 +26,7 @@ ATLAS_VECTOR_SEARCH_INDEX_NAME = "vector_index"
 
 MONGODB_COLLECTION = client[DB_NAME][COLLECTION_NAME]
 
-def vector_db_urls(url=None,audio=None):
+def vector_db_urls(url,audio=None):
     # loader = None
     # if url:
     #     # urls = retrieve_content_from_all_urls(url)
@@ -34,9 +38,11 @@ def vector_db_urls(url=None,audio=None):
     # if audio:
     #     file = save_text_to_file(audio)
     #     loader = TextLoader('audio_files/1.txt')
-    urls = [url]
+    urls = url
     print(urls)
-    loader = UnstructuredURLLoader(urls=urls)
+    # loader = UnstructuredURLLoader(urls=urls)
+    loader = RecursiveUrlLoader(url=url, max_depth=2, extractor=lambda x: Soup(x, "html.parser").text)
+
     print(loader, " Loader")
     data = loader.load()
     print(data, " Data")

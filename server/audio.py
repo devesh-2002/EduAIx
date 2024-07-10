@@ -32,5 +32,5 @@ def save_text_to_file(audio):
             file.write(text)
         print(f'Text saved successfully to audio_files')
     except Exception as e:
-        print(f'Error saving text to {audio_files}: {e}')
+        print(f'Error saving text to audio_files: {e}')
 

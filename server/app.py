@@ -18,7 +18,7 @@ def process_data(
 
         if audio_file and prompt:
             answer = prompt_template(prompt,None,audio_file)
-            return {"transcript ":transcript}
+            return {"transcript ":answer}
         
         if start_url and prompt:
             answer = prompt_template(prompt, start_url,None)

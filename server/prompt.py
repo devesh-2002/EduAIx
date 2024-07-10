@@ -7,8 +7,13 @@ from mongodb_rag import vector_db_urls
 load_dotenv()
 
 
-def prompt_template(prompt, url):
-  vector_search = vector_db_urls(url)
+def prompt_template(prompt, url=None, text_audio=None):
+  if url:
+          vector_search = vector_db_urls(url,None)
+          print(vector_search)
+  if text_audio:
+        vector_search = vector_db_urls(None,text_audio)
+        print(vector_search)
   docs_with_score = vector_search.similarity_search_with_score(query=prompt,k=1)
 
   llm = OpenAI(openai_api_key=os.getenv('OPENAI_API_KEY'))

@@ -17,13 +17,11 @@ def process_data(
             raise HTTPException(status_code=400, detail="Cannot process both audio file and start URL together.")
 
         if audio_file and prompt:
-            transcript = audio_text(audio_file)
-            # answer = prompt_template(prompt, start_url)
-            # print(answer)
+            answer = prompt_template(prompt,None,audio_file)
             return {"transcript ":transcript}
         
-        elif start_url and prompt:
-            answer = prompt_template(prompt, start_url)
+        if start_url and prompt:
+            answer = prompt_template(prompt, start_url,None)
             return {"Answer ": answer}
 
         elif prompt:

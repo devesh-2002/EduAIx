@@ -24,3 +24,13 @@ def audio_text(audio):
     response = deepgram.listen.prerecorded.v("1").transcribe_file(payload, options)
     res = response.results.channels[0]["alternatives"][0]["transcript"]
     return res
+
+def save_text_to_file(audio):
+    text = audio_text(audio)
+    try:
+        with open('audio_files/1.txt', 'w') as file:
+            file.write(text)
+        print(f'Text saved successfully to audio_files')
+    except Exception as e:
+        print(f'Error saving text to {audio_files}: {e}')
+

@@ -1,5 +1,5 @@
 import ClassroomModel from "./components/classroomModel";
-import { ChakraProvider,Heading, Center,Text} from '@chakra-ui/react'
+import { Heading, Center} from '@chakra-ui/react'
 function App() {
   return (
     <div>

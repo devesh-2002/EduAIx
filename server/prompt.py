@@ -8,12 +8,16 @@ from mongodb_rag import vector_db_urls
 load_dotenv()
 
 
-def prompt_template(prompt, url=None, text_audio=None):
+def prompt_template(prompt, url=None, text_audio=None,pdf=None):
   if url:
-          vector_search = vector_db_urls(url,None)
+          vector_search = vector_db_urls(url,None,None)
           print(vector_search)
   if text_audio:
         vector_search = vector_db_urls(None,text_audio)
+        print(vector_search)
+        
+  if pdf:
+        vector_search = vector_db_urls(None,None,pdf)
         print(vector_search)
   docs_with_score = vector_search.similarity_search_with_score(query=prompt,k=1)
 

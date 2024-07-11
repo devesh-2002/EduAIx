@@ -27,6 +27,7 @@ def audio_text(audio):
 
 def save_text_to_file(audio):
     text = audio_text(audio)
+    print(text, " : Text")
     try:
         with open('audio_files/1.txt', 'w') as file:
             file.write(text)

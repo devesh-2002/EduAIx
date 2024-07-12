@@ -1,12 +1,28 @@
-import ClassroomModel from "./components/classroomModel";
-import { Heading, Center} from '@chakra-ui/react'
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Heading, Center, VStack, Box } from '@chakra-ui/react';
+import StudentAuth from './components/studentAuth';
+import ClassroomModel from './components/classroomModel';
+import Navbar from './components/Navbar';
+import TeacherAuth from './components/teacherAuth';
+
 function App() {
   return (
-    <div>
-      <Heading><Center>EduAIx</Center></Heading>
-      <ClassroomModel />
-    </div>
-    );
+    <Router>
+      <Navbar />
+      <Box px={8} py={4}>
+        <Center>
+          <Heading as="h1" size="xl">EduAIx - The AI based Education System</Heading>
+        </Center>
+
+        <Routes>
+          <Route path="/student" element={<StudentAuth />} />
+          <Route path="/teacher" element={<TeacherAuth />} />
+          <Route path="/" element={<ClassroomModel />}/>
+        </Routes>
+      </Box>
+    </Router>
+  );
 }
 
 export default App;

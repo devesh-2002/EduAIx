@@ -14,7 +14,7 @@ import {
 } from '@chakra-ui/react';
 import { HamburgerIcon, CloseIcon } from '@chakra-ui/icons';
 import { Link } from 'react-router-dom';
-
+import ColorModeToggle from './colorMode'
 const Links = ['Home', 'Student', 'Teacher', 'Contact Us'];
 
 const NavLink = ({ children }) => {
@@ -56,6 +56,7 @@ export default function Navbar() {
               {Links.map((link) => (
                 <NavLink key={link}>{link}</NavLink>
               ))}
+              <ColorModeToggle />
             </HStack>
           </HStack>
           <Flex alignItems={'center'}>

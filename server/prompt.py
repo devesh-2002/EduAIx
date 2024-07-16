@@ -37,3 +37,5 @@ def prompt_template(prompt, url=None, text_audio=None,pdf=None):
   response = chain.invoke({"input": input_docs})
   print(response['text'])
   return response['text']
+
+

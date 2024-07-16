@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, File, UploadFile, Query, Request
 from audio import audio_text
-from mongodb_rag import vector_db_urls
+from mongodb_rag import vector_db_urls, teacher_question
 from prompt import prompt_template
 from scraping import retrieve_content_from_all_urls
 import os
@@ -69,6 +69,32 @@ async def process_data(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error processing request: {str(e)}")
 
+@app.post('/teacher')
+async def create_questions(
+    pdf_file: UploadFile = File(...),  # Use ... for required fields
+    n_ques: str = Query(None),
+    total_marks: str = Query(None),
+    additional_inst: str = Query(None)
+):
+    try:
+        os.makedirs('temp', exist_ok=True)
+        
+        pdf_path = f"temp/{pdf_file.filename}"
+        with open(pdf_path, "wb") as f:
+            f.write(await pdf_file.read())
+
+        quest = teacher_question(pdf_path, n_ques, total_marks, additional_inst)
+
+        # os.remove(pdf_path)
+
+        return quest
+
+    except Exception as e:
+        return {"error": str(e)}
+
+
+
+    
 @app.get("/")
 def read_root():
     return {"Hello": "World"}

@@ -11,3 +11,6 @@ openai
 python-dotenv
 deepgram-sdk
 langchain-cli
+langchain-chroma
+langchainhub
+ppdf

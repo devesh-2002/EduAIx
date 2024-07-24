@@ -85,7 +85,6 @@ async def create_questions(
 
         quest = teacher_question(pdf_path, n_ques, total_marks, additional_inst)
 
-        # os.remove(pdf_path)
 
         return quest
 

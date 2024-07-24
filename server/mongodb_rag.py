@@ -17,12 +17,17 @@ from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain.chains import create_retrieval_chain
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
+from langchain.chains import RetrievalQA
+
 from langchain import hub
 from langchain_core.prompts import PromptTemplate
 from openai import OpenAI
-
+from langchain_openai import OpenAI
 import os
 from dotenv import load_dotenv
+from langchain_core.prompts import ChatPromptTemplate
+
+
 load_dotenv()
 
 MONGO_URI = os.getenv('MONGO_URI')
@@ -37,7 +42,6 @@ MONGODB_COLLECTION = client[DB_NAME][COLLECTION_NAME]
 def vector_db_urls(url=None,audio=None,pdf=None):
     loader = None
     if url:
-        # urls = retrieve_content_from_all_urls(url)
         loader = RecursiveUrlLoader(url=url, max_depth=2, extractor=lambda x: Soup(x, "html.parser").text)
     if audio:
         text = save_text_to_file(audio)
@@ -62,58 +66,33 @@ def vector_db_urls(url=None,audio=None,pdf=None):
     return vector_search
 
 def teacher_question(pdf_path, n_ques, total_marks, additional_inst):
-    def format_docs(docs):
-        return "\n\n".join(doc.page_content for doc in docs)
-
     loader = PyPDFLoader(pdf_path)
     data = loader.load()
-    print(data," Data")
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
-    print(text_splitter," Text splitter")
     docs = text_splitter.split_documents(data)
     print(docs, " Docs")
-    client = OpenAI()
-    system_prompt = f" Generate {n_ques} questions based on the given pdf. The Total Marks of all questions combined should be : {total_marks}. Also follow these additional instructions : {additional_inst}. Don't mention the word document anywhere. Assure that each question and (if) subquestion should be properly assigned marks to match the total."
-    response = client.chat.completions.create(
-    model="gpt-3.5-turbo",
-    temperature=0.2,
-    messages=[
-        {"role": "system", "content": system_prompt},
-        {"role": "user", "content": f"{docs}"}
-    ]
-    )
-    print(response.choices[0].message.content)
-    return (response.choices[0].message.content)
+    llm = OpenAI(openai_api_key=os.getenv('OPENAI_API_KEY'))
+    embedding_function = OpenAIEmbeddings()
+    vectorstore = Chroma.from_documents(docs, embedding_function)
+    retriever = vectorstore.as_retriever(search_type="similarity", search_kwargs={"k": 10})
 
-    # prompt = hub.pull("rlm/rag-prompt")
-    
-    # db = Chroma.from_documents(docs, OpenAIEmbeddings())
-    # retriever = db.as_retriever()
-    
-    # system_prompt = f" Generate {n_ques} questions based on the given pdf. The Total Marks of all questions combined should be : {total_marks}. Also follow these additional instructions : {additional_inst}."
-    
-    # llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
-    
-    # template = f"""
-    # {docs}
-    # {system_prompt}
+    def format_docs(docs):
+        return "\n".join(doc.page_content for doc in docs)
+  
+    prompt_temp = f"Generate {n_ques} questions only for Total Marks : {total_marks}. Also follow Additional Instructions : {additional_inst}"
 
-    # Questions :
-    # """
-    # print(template)
-    # custom_rag_prompt = PromptTemplate.from_template(template)
-    
-    # rag_chain = (
-    #     {"context": retriever | format_docs, "question": RunnablePassthrough()}
-    #     | custom_rag_prompt
-    #     | llm
-    #     | StrOutputParser()
-    # )
-    
-    # generated_questions = rag_chain.invoke(system_prompt)
-    
-    # print(generated_questions)
-
-    # return generated_questions
-
+    prompt_template = """You are a Question generator chatbot. 
+      You need to generate questions based on the context and on the instructions specified. Also mention the marks besides every question and subquestion.
+      
+        {question}
+        Context :
+        {context} 
+      """
+    prompt = hub.pull("rlm/rag-prompt")
+    print(retriever | format_docs , " : Context")
+    prompt = ChatPromptTemplate.from_messages([("human", prompt_template)])
+    rag_chain = {"context": retriever, "question": RunnablePassthrough()} | prompt | llm
+    response = rag_chain.invoke(prompt_temp)
+    print(response)
+    return response
 

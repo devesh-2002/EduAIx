@@ -6,6 +6,7 @@ from scraping import retrieve_content_from_all_urls
 import os
 from dotenv import load_dotenv
 from pymongo import MongoClient
+from fastapi.middleware.cors import CORSMiddleware
 
 load_dotenv()
 
@@ -27,6 +28,13 @@ async def cleanup_mongodb_middleware(request: Request, call_next):
     response = await call_next(request)
     return response
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],  
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.post("/process/")
 async def process_data(
@@ -71,7 +79,7 @@ async def process_data(
 
 @app.post('/teacher')
 async def create_questions(
-    pdf_file: UploadFile = File(...),  # Use ... for required fields
+    pdf_file: UploadFile = File(...),  
     n_ques: str = Query(None),
     total_marks: str = Query(None),
     additional_inst: str = Query(None)

@@ -11,7 +11,7 @@ import {
   Heading,
   useColorModeValue,
 } from '@chakra-ui/react';
-
+import QuestionForm from './QuestionGenerator';
 function TeacherAuth() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -47,10 +47,13 @@ function TeacherAuth() {
 
   if (isAuthenticated) {
     return (
+      <>
       <VStack spacing={4} mt={8}>
         <Heading as="h2" size="lg">Welcome, {teacherName}</Heading>
         <Button onClick={handleSignOut} colorScheme="red">Sign out</Button>
       </VStack>
+      <QuestionForm /> 
+      </>
     );
   }
 
@@ -79,6 +82,7 @@ function TeacherAuth() {
             </FormControl>
             <Button type="submit" colorScheme="blue">Sign In</Button>
             {error && <Text color="red.500">{error}</Text>}
+            
           </VStack>
         </form>
       </Box>

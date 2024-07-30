@@ -23,8 +23,11 @@ function StudentAuth() {
   return (
     <Center>
       <VStack spacing={4} mt={8}>
-        <Heading as="h2" size="lg">Student Authentication</Heading>
-        {!isAuth && (
+        {!isAuth && 
+        (
+          <>
+            <Heading as="h2" size="lg">Student Authentication</Heading>
+
           <Button
             onClick={handleSignIn}
             bg="white"
@@ -46,7 +49,7 @@ function StudentAuth() {
               style={{ marginRight: '12px' }}
             />
             Sign in with Google
-          </Button>
+          </Button></>
         )}
         {isAuth && (
           <>

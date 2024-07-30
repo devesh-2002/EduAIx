@@ -12,7 +12,7 @@ const Footer = () => {
       p={3}
       bg="gray.500"
       color="white"
-      position="fixed" 
+      position="relative" 
       bottom={0}        
       left={0}         
       right={0}         

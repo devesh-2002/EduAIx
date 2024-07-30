@@ -65,7 +65,7 @@ function UploadForm() {
                 <Textarea
                   value={description}
                   onChange={handleDescriptionChange}
-                  placeholder="Enter description..."
+                  placeholder="Enter Question"
                 />
               </FormControl>
               <Button colorScheme="blue" type="submit">
@@ -79,12 +79,6 @@ function UploadForm() {
       <GridItem>
         <Box bg="white" p={8} borderRadius="xl" boxShadow="lg">
           <Stack spacing={4}>
-            <Box>
-              <strong>File:</strong> {submittedData ? submittedData.file : ''}
-            </Box>
-            <Box>
-              <strong>Link:</strong> {submittedData ? submittedData.link : ''}
-            </Box>
             <Box>
               <strong>Description:</strong> {submittedData ? submittedData.description : ''}
             </Box>

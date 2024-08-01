@@ -18,13 +18,15 @@ import {
   useColorModeValue
 } from '@chakra-ui/react';
 import { useForm } from 'react-hook-form';
+import jsPDF from 'jspdf';
 
 function QuestionForm() {
     const { register, handleSubmit, formState: { errors } } = useForm();
     const [pdfFile, setPdfFile] = useState(null);
     const [responseMessage, setResponseMessage] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [view, setView] = useState('form'); // New state to track view
     const toast = useToast();
-    const [loading, setLoading] = useState(false); 
 
     const onSubmit = async (data) => {
         setLoading(true);
@@ -49,6 +51,7 @@ function QuestionForm() {
             const result = await response.json();
             const formattedResponse = formatResponse(result);
             setResponseMessage(formattedResponse);
+            setView('response'); // Switch to response view
             toast({
                 title: 'Success',
                 status: 'success',
@@ -72,10 +75,28 @@ function QuestionForm() {
     const formatResponse = (response) => {
         return response.split('\n').map((item, index) => {
             if (item.trim()) {
-                return <ListItem key={index}>{item.trim()}</ListItem>;
+                return item.trim();
             }
             return null;
-        });
+        }).filter(item => item); 
+    };
+
+    const downloadPDF = () => {
+        const doc = new jsPDF();
+        doc.setFontSize(12);
+
+        doc.text('Questions : ', 10, 10);
+        doc.setFontSize(10);
+        
+        if (responseMessage) {
+            let y = 20;
+            responseMessage.forEach((line, index) => {
+                doc.text(line, 10, y);
+                y += 10;
+            });
+        }
+
+        doc.save('response.pdf');
     };
 
     const formBg = useColorModeValue('white', 'gray.800');
@@ -111,7 +132,7 @@ function QuestionForm() {
                     bg={formBg}
                     borderColor={borderColor}
                 >
-                    {!responseMessage && (
+                    {view === 'form' && (
                         <Box flex="1" mr={{ md: 6 }} mb={{ base: 6, md: 0 }}>
                             <Text fontSize="2xl" fontWeight="bold" mb={4} textAlign="center">
                                 Question Generator Form
@@ -165,7 +186,7 @@ function QuestionForm() {
                         </Box>
                     )}
 
-                    {responseMessage && (
+                    {view === 'response' && (
                         <Box flex="1" p={4} borderWidth={1} my="5" borderRadius="lg" bg={responseBg} shadow="md">
                             <>
                                 <Text fontSize="lg" fontWeight="semibold">
@@ -173,8 +194,16 @@ function QuestionForm() {
                                 </Text>
                                 <Divider my={2} />
                                 <List spacing={2}>
-                                    {responseMessage}
+                                    {responseMessage.map((item, index) => (
+                                        <ListItem key={index}>{item}</ListItem>
+                                    ))}
                                 </List>
+                                <Button mt={4} colorScheme="teal" onClick={downloadPDF}>
+                                    Download PDF
+                                </Button>
+                                <Button mt={4} ml={4} colorScheme="blue" onClick={() => setView('form')}>
+                                    Back
+                                </Button>
                             </>
                         </Box>
                     )}

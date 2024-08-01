@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, File, UploadFile, Query, Request
+from fastapi import FastAPI, HTTPException, File, UploadFile, Query, Request, Form
 from audio import audio_text
 from mongodb_rag import vector_db_urls, teacher_question
 from prompt import prompt_template
@@ -40,10 +40,11 @@ app.add_middleware(
 async def process_data(
     audio_file: UploadFile = File(None),
     start_url: str = Query(None),
-    prompt: str = Query(None),
+    prompt: str = Form(...),
     pdf_file: UploadFile = File(None),
 
 ):
+    print(f"Received audio_file: {audio_file}, start_url: {start_url}, prompt: {prompt}, pdf_file: {pdf_file}")
     try:
         if audio_file and start_url:
             raise HTTPException(status_code=400, detail="Cannot process both audio file and start URL together.")
@@ -68,6 +69,7 @@ async def process_data(
                 f.write(await pdf_file.read())
             
             answer = prompt_template(prompt,None,None, pdf_path)
+            return {"Answer ": answer}
         elif prompt:
             return {"prompt": prompt}
         

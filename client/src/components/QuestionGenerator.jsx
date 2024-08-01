@@ -1,5 +1,22 @@
 import React, { useState } from 'react';
-import { Box, Button, FormControl, FormLabel, Input, Textarea, useToast, VStack, StackDivider, Text, Flex, Spinner, List, ListItem, Divider } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  FormControl,
+  FormLabel,
+  Input,
+  Textarea,
+  useToast,
+  VStack,
+  StackDivider,
+  Text,
+  Flex,
+  Spinner,
+  List,
+  ListItem,
+  Divider,
+  useColorModeValue
+} from '@chakra-ui/react';
 import { useForm } from 'react-hook-form';
 
 function QuestionForm() {
@@ -8,6 +25,7 @@ function QuestionForm() {
     const [responseMessage, setResponseMessage] = useState(null);
     const toast = useToast();
     const [loading, setLoading] = useState(false); 
+
     const onSubmit = async (data) => {
         setLoading(true);
         try {
@@ -29,7 +47,6 @@ function QuestionForm() {
             }
 
             const result = await response.json();
-            console.log(result);
             const formattedResponse = formatResponse(result);
             setResponseMessage(formattedResponse);
             toast({
@@ -51,6 +68,7 @@ function QuestionForm() {
             setLoading(false); 
         }
     };
+
     const formatResponse = (response) => {
         return response.split('\n').map((item, index) => {
             if (item.trim()) {
@@ -60,15 +78,20 @@ function QuestionForm() {
         });
     };
 
+    const formBg = useColorModeValue('white', 'gray.800');
+    const containerBg = useColorModeValue('gray.100', 'gray.900');
+    const borderColor = useColorModeValue('gray.200', 'gray.600');
+    const responseBg = useColorModeValue('gray.50', 'gray.700');
+
     return (
         <>
-               {loading ? (
+            {loading ? (
                 <Flex
                     direction="column"
                     align="center"
                     justify="center"
                     minH="100vh"
-                    bg="white"
+                    bg={containerBg}
                 >
                     <Spinner size="xl" color="teal.500" />
                     <Text mt={4} fontSize="lg" fontWeight="semibold">
@@ -76,14 +99,29 @@ function QuestionForm() {
                     </Text>
                 </Flex>
             ) : (
-                <Flex direction={{ base: 'column', md: 'row' }} maxW="xl" mx="auto" p={6} borderWidth={1} my="5" borderRadius="lg" boxShadow="lg" bg="white">
+                <Flex
+                    direction={{ base: 'column', md: 'row' }}
+                    maxW="xl"
+                    mx="auto"
+                    p={6}
+                    borderWidth={1}
+                    my="5"
+                    borderRadius="lg"
+                    boxShadow="lg"
+                    bg={formBg}
+                    borderColor={borderColor}
+                >
                     {!responseMessage && (
                         <Box flex="1" mr={{ md: 6 }} mb={{ base: 6, md: 0 }}>
                             <Text fontSize="2xl" fontWeight="bold" mb={4} textAlign="center">
                                 Question Generator Form
                             </Text>
                             <form onSubmit={handleSubmit(onSubmit)}>
-                                <VStack spacing={6} align="stretch" divider={<StackDivider borderColor="gray.200" />}>
+                                <VStack
+                                    spacing={6}
+                                    align="stretch"
+                                    divider={<StackDivider borderColor={borderColor} />}
+                                >
                                     <FormControl id="n_ques" isRequired isInvalid={!!errors.n_ques}>
                                         <FormLabel fontWeight="semibold">Number of Questions</FormLabel>
                                         <Input 
@@ -128,7 +166,7 @@ function QuestionForm() {
                     )}
 
                     {responseMessage && (
-                        <Box flex="1" p={4} borderWidth={1} my="5" borderRadius="lg" bg="gray.50" shadow="md">
+                        <Box flex="1" p={4} borderWidth={1} my="5" borderRadius="lg" bg={responseBg} shadow="md">
                             <>
                                 <Text fontSize="lg" fontWeight="semibold">
                                     Response:
@@ -142,7 +180,6 @@ function QuestionForm() {
                     )}
                 </Flex>
             )}
-
         </>
     );
 }

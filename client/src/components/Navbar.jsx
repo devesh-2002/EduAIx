@@ -14,7 +14,8 @@ import {
 } from '@chakra-ui/react';
 import { HamburgerIcon, CloseIcon } from '@chakra-ui/icons';
 import { Link } from 'react-router-dom';
-import ColorModeToggle from './colorMode'
+import ColorModeToggle from './colorMode';
+
 const Links = ['Home', 'Student', 'Teacher', 'Contact Us'];
 
 const NavLink = ({ children }) => {
@@ -24,8 +25,8 @@ const NavLink = ({ children }) => {
     <Box
       as={Link}
       to={to}
-      px={2}
-      py={1}
+      px={4}
+      py={2}
       rounded={'md'}
       _hover={{
         textDecoration: 'none',
@@ -41,9 +42,9 @@ export default function Navbar() {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
-    <>
-      <Box bg={useColorModeValue('gray.100', 'gray.900')} px={4}>
-        <Flex h={16} alignItems={'center'} justifyContent={'space-between'}>
+    <Box bg={useColorModeValue('gray.100', 'gray.900')} px={4}>
+      <Flex h={16} alignItems={'center'} justifyContent={'center'} direction="column">
+        <Flex alignItems={'center'} justifyContent={'space-between'} w="full">
           <IconButton
             size={'md'}
             icon={isOpen ? <CloseIcon /> : <HamburgerIcon />}
@@ -51,15 +52,17 @@ export default function Navbar() {
             display={{ md: 'none' }}
             onClick={isOpen ? onClose : onOpen}
           />
-          <HStack spacing={8} alignItems={'center'}>
-            <HStack as={'nav'} spacing={4} display={{ base: 'none', md: 'flex' }}>
-              {Links.map((link) => (
-                <NavLink key={link}>{link}</NavLink>
-              ))}
-              <ColorModeToggle />
+          <Flex alignItems={'center'} justifyContent={'center'} flex="1">
+            <HStack spacing={8} alignItems={'center'}>
+              <HStack as={'nav'} spacing={4} display={{ base: 'none', md: 'flex' }}>
+                {Links.map((link) => (
+                  <NavLink key={link}>{link}</NavLink>
+                ))}
+                <ColorModeToggle />
+              </HStack>
             </HStack>
-          </HStack>
-          <Flex alignItems={'center'}>
+          </Flex>
+          <Flex alignItems={'center'} display={{ base: 'none', md: 'flex' }}>
             <Menu>
               <MenuButton
                 as={Button}
@@ -74,14 +77,14 @@ export default function Navbar() {
 
         {isOpen ? (
           <Box pb={4} display={{ md: 'none' }}>
-            <Stack as={'nav'} spacing={4}>
+            <Stack as={'nav'} spacing={4} alignItems={'center'}>
               {Links.map((link) => (
                 <NavLink key={link}>{link}</NavLink>
               ))}
             </Stack>
           </Box>
         ) : null}
-      </Box>
-    </>
+      </Flex>
+    </Box>
   );
 }

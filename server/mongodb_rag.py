@@ -82,8 +82,8 @@ def teacher_question(pdf_path, n_ques, total_marks, additional_inst):
     prompt_temp = f"Generate {n_ques} questions only for Total Marks : {total_marks}. Also follow Additional Instructions : {additional_inst}"
 
     prompt_template = """You are a Question generator chatbot. 
-      You need to generate questions based on the context and on the instructions specified. Also mention the marks besides every question and subquestion.
-      
+      You need to generate questions based on the context and on the instructions specified. 
+      Also mention the marks besides every question and subquestion.
         {question}
         Context :
         {context} 

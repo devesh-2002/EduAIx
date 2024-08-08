@@ -18,6 +18,9 @@ from langchain.chains import create_retrieval_chain
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 from langchain.chains import RetrievalQA
+from langchain.text_splitter import CharacterTextSplitter
+from langchain.schema import Document
+from langchain.chains import LLMChain
 
 from langchain import hub
 from langchain_core.prompts import PromptTemplate
@@ -26,7 +29,7 @@ from langchain_openai import OpenAI
 import os
 from dotenv import load_dotenv
 from langchain_core.prompts import ChatPromptTemplate
-
+import re
 
 load_dotenv()
 
@@ -96,3 +99,118 @@ def teacher_question(pdf_path, n_ques, total_marks, additional_inst):
     print(response)
     return response
 
+
+def extract_qa_pairs(text):
+    pattern = r'(\d+)\.\s+(.*?)\n(?:Answer|Ans)\s*:\s*(.*?)(?=\n\d+\.|\Z)'
+    matches = re.findall(pattern, text, re.DOTALL)
+    return [(match[1].replace('\n', ' ').strip(), match[2].replace('\n', ' ').strip()) for match in matches]
+
+def grade_answer(paper_vectorstore, qa_vectorstore, prompt_template, question, answer):
+    paper_context = paper_vectorstore.similarity_search(question, k=2)
+    qa_context = qa_vectorstore.similarity_search(question, k=1)
+    
+    context = paper_context + qa_context
+    context_text = " ".join([doc.page_content for doc in context])
+    
+    llm = OpenAI(temperature=0)
+    chain = LLMChain(llm=llm, prompt=prompt_template)
+
+    result = chain.run(question=question, answer=answer, context=context_text)
+    return result
+
+def extract_grade(result):
+    print("Full Result: ", result)
+    
+    if not result:
+        print("Error: Result is empty.")
+        return 0
+    
+    lines = result.strip().split('\n')
+    
+    for line in lines:
+        if line.startswith("Grade:"):
+            try:
+                grade = line.split(':')[1].strip()
+                
+                grade = grade.split()[0]  # Take only the numeric part
+                
+                return float(grade)
+            except (IndexError, ValueError) as e:
+                print(f"Error extracting grade from line '{line}': {e}")
+                return 0
+    
+    # If "Grade:" was not found, return 0 and print a warning
+    print("Warning: Could not find 'Grade:' in result.")
+    return 0
+
+def paper_corrector(answer_sheet_pdf, q_a_pdf, prompt_text):
+    # Load and process PDFs
+    answer_sheet_pdf_loader = PyPDFLoader(answer_sheet_pdf)
+    answer_sheet_docs = answer_sheet_pdf_loader.load()
+    
+    q_a_pdf_loader = PyPDFLoader(q_a_pdf)
+    q_a_docs = q_a_pdf_loader.load()
+    
+    # Extract QA content and pairs
+    qa_content = " ".join([doc.page_content for doc in q_a_docs])
+    qa_pairs = extract_qa_pairs(qa_content)
+
+    # Split documents and create vectorstores
+    text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
+    answer_sheet_texts = text_splitter.split_documents(answer_sheet_docs)
+    
+    embeddings = OpenAIEmbeddings(disallowed_special=())
+    paper_vectorstore = Chroma.from_documents(answer_sheet_texts, embeddings)
+    
+    qa_docs = [
+        Document(page_content=f"Question: {q}\nAnswer: {a}", metadata={"type": "qa_pair"})
+        for q, a in qa_pairs
+    ]
+    qa_vectorstore = Chroma.from_documents(qa_docs, embeddings)
+
+    # Define the prompt template
+    full_prompt = f"You need to grade as per the following prompt: {prompt_text} "
+    template = """
+      You are an expert grader.
+      Your task is to evaluate an answer given to a specific question.
+
+      Question: {question}
+      Student's Answer: {answer}
+      Relevant Information: {context}
+      """ + full_prompt + """
+      Your response should be in the following format:
+      Grade: [Your grade]
+      Explanation: [Your explanation]
+      Suggestions: [Your suggestions if any]
+      """
+
+    prompt_template = PromptTemplate(
+        input_variables=["question", "answer", "context"],
+        template=template
+    )
+
+    # Grade the answers
+    total_grade = 0
+    results = []
+    for question, answer in qa_pairs:
+        result = grade_answer(paper_vectorstore, qa_vectorstore, prompt_template, question, answer)
+        print("Result : ", result)
+        question_grade = extract_grade(result)
+        total_grade += question_grade
+
+        results.append({
+            "question": question,
+            "student_answer": answer,
+            "grade": question_grade,
+            "feedback": result
+        })
+
+    max_possible_grade = len(qa_pairs) * 2
+    percentage = (total_grade / max_possible_grade) * 100
+
+    return {
+        "results": results,
+        "total_grade": total_grade,
+        "max_possible_grade": max_possible_grade,
+        "percentage": f"{percentage:.2f}%"
+    }

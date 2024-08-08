@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, File, UploadFile, Query, Request, Form
 from audio import audio_text
-from mongodb_rag import vector_db_urls, teacher_question
+from mongodb_rag import vector_db_urls, teacher_question, paper_corrector
 from prompt import prompt_template
 from scraping import retrieve_content_from_all_urls
 import os
@@ -101,9 +101,26 @@ async def create_questions(
     except Exception as e:
         return {"error": str(e)}
 
-
-
-    
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
+@app.post('/paper-correction')
+async def paper_correction(
+    answer_sheet_loader: UploadFile = File(...),
+    q_a_loader: UploadFile = File(...),
+    prompt: str = Query(None)
+):
+    try:
+        os.makedirs('temp', exist_ok=True)
+        
+        answer_sheet_pdf_path = f"temp/{answer_sheet_loader.filename}"
+        with open(answer_sheet_pdf_path, "wb") as f:
+            content = await answer_sheet_loader.read()
+            f.write(content)
+        
+        q_a_pdf_path = f"temp/{q_a_loader.filename}"
+        with open(q_a_pdf_path, "wb") as f:
+            content = await q_a_loader.read()
+            f.write(content)
+        
+        marks_allotted = paper_corrector(answer_sheet_pdf_path, q_a_pdf_path, prompt)
+        return marks_allotted
+    except Exception as e:
+        return {"error": str(e)}

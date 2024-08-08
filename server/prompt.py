@@ -50,3 +50,4 @@ def prompt_template(prompt, url=None, text_audio=None,pdf=None):
       return docs['result']
 
 
+

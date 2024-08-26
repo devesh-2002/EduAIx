@@ -83,16 +83,16 @@ function QuestionForm() {
 
     const downloadPDF = () => {
         const doc = new jsPDF();
-        doc.setFontSize(12);
+        doc.setFontSize(6);
 
         doc.text('Questions : ', 10, 10);
-        doc.setFontSize(10);
+        doc.setFontSize(5);
         
         if (responseMessage) {
-            let y = 20;
+            let y = 10;
             responseMessage.forEach((line, index) => {
-                doc.text(line, 10, y);
-                y += 10;
+                doc.text(line, 5, y);
+                y += 5;
             });
         }
 

@@ -6,6 +6,7 @@ import ClassroomModel from './components/classroomModel';
 import Navbar from './components/Navbar';
 import TeacherAuth from './components/teacherAuth';
 import Footer from './components/Footer';
+import PaperCorrection from './components/PaperCorrection';
 function App() {
   return (
     <Router>
@@ -14,10 +15,11 @@ function App() {
         <Routes>
           <Route path="/student" element={<StudentAuth />} />
           <Route path="/teacher" element={<TeacherAuth />} />
+          <Route path='/paper-corrector' element={<PaperCorrection/>} />
           <Route path="/" element={<ClassroomModel />}/>
         </Routes>
       </Box>
-      <Footer />
+      {/* <Footer /> */}
     </Router>
   );
 }

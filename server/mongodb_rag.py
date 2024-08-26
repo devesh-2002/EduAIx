@@ -132,30 +132,26 @@ def extract_grade(result):
             try:
                 grade = line.split(':')[1].strip()
                 
-                grade = grade.split()[0]  # Take only the numeric part
+                grade = grade.split()[0]  
                 
                 return float(grade)
             except (IndexError, ValueError) as e:
                 print(f"Error extracting grade from line '{line}': {e}")
                 return 0
     
-    # If "Grade:" was not found, return 0 and print a warning
     print("Warning: Could not find 'Grade:' in result.")
     return 0
 
 def paper_corrector(answer_sheet_pdf, q_a_pdf, prompt_text):
-    # Load and process PDFs
     answer_sheet_pdf_loader = PyPDFLoader(answer_sheet_pdf)
     answer_sheet_docs = answer_sheet_pdf_loader.load()
     
     q_a_pdf_loader = PyPDFLoader(q_a_pdf)
     q_a_docs = q_a_pdf_loader.load()
     
-    # Extract QA content and pairs
     qa_content = " ".join([doc.page_content for doc in q_a_docs])
     qa_pairs = extract_qa_pairs(qa_content)
 
-    # Split documents and create vectorstores
     text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
     answer_sheet_texts = text_splitter.split_documents(answer_sheet_docs)
     
@@ -168,7 +164,6 @@ def paper_corrector(answer_sheet_pdf, q_a_pdf, prompt_text):
     ]
     qa_vectorstore = Chroma.from_documents(qa_docs, embeddings)
 
-    # Define the prompt template
     full_prompt = f"You need to grade as per the following prompt: {prompt_text} "
     template = """
       You are an expert grader.
@@ -177,11 +172,14 @@ def paper_corrector(answer_sheet_pdf, q_a_pdf, prompt_text):
       Question: {question}
       Student's Answer: {answer}
       Relevant Information: {context}
+
       """ + full_prompt + """
       Your response should be in the following format:
-      Grade: [Your grade]
+
+      Grade: [Your marks in number, only 1 number. Like 1,2,3 etc. No need to mention 1/5 or 1/10 etc. ]
       Explanation: [Your explanation]
       Suggestions: [Your suggestions if any]
+
       """
 
     prompt_template = PromptTemplate(
@@ -205,12 +203,12 @@ def paper_corrector(answer_sheet_pdf, q_a_pdf, prompt_text):
             "feedback": result
         })
 
-    max_possible_grade = len(qa_pairs) * 2
-    percentage = (total_grade / max_possible_grade) * 100
+    # max_possible_grade = len(qa_pairs) * max(question_grade)
+    # percentage = (total_grade / max_possible_grade) * 100
 
     return {
         "results": results,
         "total_grade": total_grade,
-        "max_possible_grade": max_possible_grade,
-        "percentage": f"{percentage:.2f}%"
+        # "max_possible_grade": max_possible_grade,
+        # "percentage": f"{percentage:.2f}%"
     }

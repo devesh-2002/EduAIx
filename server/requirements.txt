@@ -13,3 +13,4 @@ deepgram-sdk
 langchain-cli
 langchain-chroma
 langchainhub
+python-multipart

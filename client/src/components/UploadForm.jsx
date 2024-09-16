@@ -81,7 +81,7 @@ function UploadForm() {
     }
   
     try {
-      const response = await fetch('http://localhost:8000/process/', {
+      const response = await fetch('https://eduaix.onrender.com/process/', {
         method: 'POST',
         body: formData,
       });

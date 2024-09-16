@@ -66,7 +66,7 @@ const PaperCorrection = () => {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('http://localhost:8000/paper-correction', {
+      const response = await fetch('https://eduaix.onrender.com/paper-correction', {
         method: 'POST',
         body: formData,
       });

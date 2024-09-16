@@ -39,7 +39,7 @@ function QuestionForm() {
                 formData.append('pdf_file', pdfFile);
             }
 
-            const response = await fetch('http://localhost:8000/teacher', {
+            const response = await fetch('https://eduaix.onrender.com/teacher', {
                 method: 'POST',
                 body: formData,
             });

@@ -12,9 +12,5 @@ python-dotenv
 deepgram-sdk
 langchain-cli
 langchain-chroma
-<<<<<<< HEAD
-langchainhub
-=======
 langchainhub
 python-multipart
->>>>>>> 09350b6094d6d6503323466e30de8e3797b82d69

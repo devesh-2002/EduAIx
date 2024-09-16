@@ -97,43 +97,44 @@ const PaperCorrection = () => {
 
   const downloadPDF = () => {
     if (!responseData) return;
-  
     const pdf = new jsPDF('p', 'pt', 'a4');
+    const pageWidth = pdf.internal.pageSize.width;
+    const pageHeight = pdf.internal.pageSize.height;
+    const margin = 40;
+    let y = margin;
   
-    pdf.setFontSize(12);
-    pdf.text('Detailed Response', 40, 40);
+    const addText = (text, fontSize, isBold = false) => {
+      pdf.setFontSize(fontSize);
+      if (isBold) pdf.setFont(undefined, 'bold');
+      else pdf.setFont(undefined, 'normal');
   
-    let y = 60;
+      const lines = pdf.splitTextToSize(text, pageWidth - 2 * margin);
+      lines.forEach(line => {
+        if (y > pageHeight - margin) {
+          pdf.addPage();
+          y = margin;
+        }
+        pdf.text(line, margin, y);
+        y += fontSize + 5;
+      });
+      y += 10; 
+    };
   
-    pdf.setFontSize(14);
-    pdf.text('Summary:', 40, y);
-    y += 20;
-  
-    pdf.setFontSize(12);
-    pdf.text(`Total Grade: ${responseData.total_grade}`, 40, y);
-    y += 15;
-  
-    y += 40; 
+    addText('Detailed Response', 16, true);
+    addText('Summary:', 14, true);
+    addText(`Total Grade: ${responseData.total_grade}`, 12);
   
     responseData.results.forEach((result, index) => {
-      y += 20;
-      pdf.setFontSize(14);
-      pdf.text(`Result ${index + 1}:`, 40, y);
-      y += 20;
-  
-      pdf.setFontSize(12);
-      pdf.text(`Question: ${result.question}`, 40, y);
-      y += 15;
-      pdf.text(`Answer: ${result.student_answer}`, 40, y);
-      y += 15;
-      pdf.text(`Feedback: ${result.feedback}`, 40, y);
-      y += 40;
+      addText(`Result ${index + 1}:`, 14, true);
+      addText(`Question: ${result.question}`, 12);
+      addText(`Answer: ${result.student_answer}`, 12);
+      addText(`Feedback: ${result.feedback}`, 12);
+      y += 20; 
     });
   
     pdf.save('response.pdf');
   };
-  
-  return (
+    return (
     <>
       <Center mb={6}>
         <Heading as="h1" size="xl">Welcome to AI-based Paper Corrector!</Heading>

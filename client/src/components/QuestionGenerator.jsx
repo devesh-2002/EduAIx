@@ -51,7 +51,7 @@ function QuestionForm() {
             const result = await response.json();
             const formattedResponse = formatResponse(result);
             setResponseMessage(formattedResponse);
-            setView('response'); // Switch to response view
+            setView('response');
             toast({
                 title: 'Success',
                 status: 'success',

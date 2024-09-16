@@ -7,6 +7,7 @@ import Navbar from './components/Navbar';
 import TeacherAuth from './components/teacherAuth';
 import Footer from './components/Footer';
 import PaperCorrection from './components/PaperCorrection';
+import QuestionForm from'./components/QuestionGenerator';
 function App() {
   return (
     <Router>
@@ -14,7 +15,7 @@ function App() {
       <Box px={8} py={4}>
         <Routes>
           <Route path="/student" element={<StudentAuth />} />
-          <Route path="/teacher" element={<TeacherAuth />} />
+          <Route path="/teacher" element={<QuestionForm />} />
           <Route path='/paper-corrector' element={<PaperCorrection/>} />
           <Route path="/" element={<ClassroomModel />}/>
         </Routes>

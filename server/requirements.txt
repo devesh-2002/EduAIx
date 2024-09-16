@@ -14,3 +14,4 @@ langchain-cli
 langchain-chroma
 langchainhub
 python-multipart
+fastapi[standard]

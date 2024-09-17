@@ -12,3 +12,7 @@ EduAIx is an AI based Educational Platform, aimed to help both Students and Teac
 2. Javascript - React.js, Three.js
 3. Vector Databases - MongoDB Atlas, ChromaDB
 4. API - OpenAI, Deepgram
+
+## Feature Enhancements
+1. Improving Response of the LLMs
+2. Gesture Detection using OpenCV

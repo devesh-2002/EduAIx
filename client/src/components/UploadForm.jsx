@@ -70,13 +70,13 @@ function UploadForm() {
     const formData = new FormData();
     formData.append('prompt', prompt);
   
-    if (inputType === 'file') {
+    
       if (fileType === 'audio') {
         formData.append('audio_file', file);
-      } else {
+      } if (fileType === 'pdf')  {
         formData.append('pdf_file', file);
       }
-    } else {
+     if (fileType === 'link')  {
       formData.append('start_url', link);
     }
   

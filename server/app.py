@@ -55,11 +55,11 @@ async def process_data(
             with open(audio_path, "wb") as f:
                 f.write(await audio_file.read())
 
-            answer = prompt_template(prompt,None,audio_path,None)
+            answer = prompt_template(prompt=prompt,None,audio_file=audio_path,None)
             return {"Answer ":answer}
         
         if start_url and prompt:
-            answer = prompt_template(None, start_url,prompt,None)
+            answer = prompt_template(None, start_url=start_url,prompt=prompt,None)
             return {"Answer ": answer}
 
         if prompt and pdf_file:

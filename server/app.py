@@ -59,7 +59,7 @@ async def process_data(
             return {"Answer ":answer}
         
         if start_url and prompt:
-            answer = prompt_template(prompt, start_url,None,None)
+            answer = prompt_template(None, start_url,prompt,None)
             return {"Answer ": answer}
 
         if prompt and pdf_file:
